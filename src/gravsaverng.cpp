@@ -34,6 +34,7 @@ namespace {
     // array<dx, dy>
     std::array<sf::Vector2f, N_ASTEROIDS> asteroidVelocities;
     std::array<bool, N_ASTEROIDS> asteroidIsAlive;
+    size_t numAsteroidsAlive = 0;
 
     // array<px, py, mass>
     // mass should be chosen by taking a uniform random between MIN and MAX
@@ -57,6 +58,7 @@ namespace {
                 auto a = uniformRand(0, 2 * PI);
                 asteroidVelocities[i] = { v * cos(a), v * sin(a) };
                 asteroidIsAlive[i] = true;
+                ++numAsteroidsAlive;
             }
         }
 
@@ -182,6 +184,7 @@ void Update()
         if (asteroidIsAlive[a]) {
             if (isOutOfBounds(asteroidVertexes[a * 2].position)) {
                 asteroidIsAlive[a] = false;
+                --numAsteroidsAlive;
                 asteroidVertexes[a * 2].color = sf::Color::Transparent;
             }
         }
@@ -193,7 +196,6 @@ void Update()
     }
 
     // main gravity calculation loop
-//#pragma omp parallel for schedule(dynamic)
     for (int a = 0; a < N_ASTEROIDS; ++a) {
         if (asteroidIsAlive[a]) {
             for (int p = 0; p < N_PLANETS; ++p) {
@@ -201,6 +203,7 @@ void Update()
                 auto& asteroid = asteroidVertexes[a * 2];
                 if (hitsPlanet(asteroid.position, planet)) {
                     asteroidIsAlive[a] = false;
+                    --numAsteroidsAlive;
                     asteroid.color = sf::Color::Transparent;
                     break;
                 }
@@ -229,12 +232,6 @@ void Update()
     }
 
     { // check to see how many asteroids are alive, and if its under a limit, generate new ones in a new spot
-        int numAsteroidsAlive = 0;
-        for (const auto& alive : asteroidIsAlive) {
-            if (alive)
-                ++numAsteroidsAlive;
-        }
-
         if (resetPending && std::chrono::steady_clock::now() > timeOfReset) {
             reset();
             resetPending = false;
@@ -244,11 +241,6 @@ void Update()
 
 void DarkenScreen(sf::RenderTexture &renderTexture)
 {
-    int numAsteroidsAlive = 0;
-    for (const auto& alive : asteroidIsAlive) {
-        if (alive)
-            ++numAsteroidsAlive;
-    }
     if(!resetPending && numAsteroidsAlive + ASTEROIDS_LEFT_BEFORE_RESET > N_ASTEROIDS * .05f)
     {
         StopWatch sw("darken the screen");
@@ -284,8 +276,7 @@ void DarkenScreen(sf::RenderTexture &renderTexture)
         renderStates.blendMode = sf::BlendNone;
 
         renderTexture.draw(currentSprite, renderStates);
-    }
-    else {
+    } else {
         if (!resetPending) {
             timeOfReset = std::chrono::steady_clock::now() + std::chrono::seconds(10);
             resetPending = true;
