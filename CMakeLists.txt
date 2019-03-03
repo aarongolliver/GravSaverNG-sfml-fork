@@ -23,6 +23,12 @@ target_link_libraries(gravsaverng PRIVATE
 
 add_executable(shader_tester
     shader_tester/src/shader_tester.cpp
+    shader_tester/src/shader_tester.h
+    shader_tester/src/shader_header.h
+)
+
+target_include_directories(simplefilewatcher PRIVATE
+    shader_tester/src/
 )
 
 target_link_libraries(shader_tester PRIVATE

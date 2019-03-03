@@ -16,7 +16,7 @@ namespace {
     float S_WID_SCALE;
     float S_HEI_SCALE;
     float SCALE;
-    const int N_ASTEROIDS = 300000;
+    const int N_ASTEROIDS = 30000;
     const int N_PLANETS = 6;
     const float ASTEROID_MASS = 100.f;
     const float PLANET_MASS_MIN = 16000.f;
@@ -27,6 +27,7 @@ namespace {
     const float DARKENING_SPEED = 24.f;
     const float COLOR_MULTIPLIER = 10.f;
     const int FPS_LIMIT = 0;
+    const auto WAIT_BEFORE_RESET = std::chrono::seconds(0);
 
     // array<<px1, py1>, <px2, py2>> + color information etc.
     sf::VertexArray asteroidVertexes{ sf::Lines, N_ASTEROIDS * 2 };
@@ -46,8 +47,27 @@ namespace {
 }
 
 namespace {
+    bool rightDistanceFromPlanets(const sf::Vector2f& pos) {
+        float minDistance = 10000000000000.f;
+        for (auto& p : planets) {
+            auto d = pos - sf::Vector2f{p.x, p.y};
+            minDistance = std::min(std::sqrt((d.x*d.x) + (d.y*d.y)), minDistance);
+        }
+
+        return minDistance > S_WID*.1 && minDistance < S_WID*.15;
+    }
     void reset() {
-        const sf::Vector2f pos = { uniformRand(0, S_WID), uniformRand(0, S_HEI) };
+        for (auto& p : planets) {
+            p.x = uniformRand(200 * 2, (1920 - 200) * (S_HEI_SCALE));
+            p.y = uniformRand(200 * 2, (1080 - 200)* (S_HEI_SCALE));
+            p.z = uniformRand(PLANET_MASS_MIN, PLANET_MASS_MAX);
+        }
+
+        sf::Vector2f pos;
+        do {
+            pos = { uniformRand(0, S_WID), uniformRand(0, S_HEI) };
+        } while (!rightDistanceFromPlanets(pos));
+
         for (int i = 0; i < N_ASTEROIDS; ++i) {
             if (!asteroidIsAlive[i]) {
                 asteroidVertexes[i * 2].position = pos;
@@ -60,12 +80,6 @@ namespace {
                 asteroidIsAlive[i] = true;
                 ++numAsteroidsAlive;
             }
-        }
-
-        for (auto& p : planets) {
-            p.x = uniformRand(200 * 2, (1920-200) * (S_HEI_SCALE));
-            p.y = uniformRand(200*2, (1080 - 200)* (S_HEI_SCALE));
-            p.z = uniformRand(PLANET_MASS_MIN, PLANET_MASS_MAX);
         }
     }
 
@@ -241,7 +255,7 @@ void Update()
 
 void DarkenScreen(sf::RenderTexture &renderTexture)
 {
-    if(!resetPending && numAsteroidsAlive + ASTEROIDS_LEFT_BEFORE_RESET > N_ASTEROIDS * .05f)
+    if(!resetPending && numAsteroidsAlive > N_ASTEROIDS * 0.1f)
     {
         StopWatch sw("darken the screen");
         static std::string darkenigShaderText =                                                                 \
@@ -278,7 +292,7 @@ void DarkenScreen(sf::RenderTexture &renderTexture)
         renderTexture.draw(currentSprite, renderStates);
     } else {
         if (!resetPending) {
-            timeOfReset = std::chrono::steady_clock::now() + std::chrono::seconds(10);
+            timeOfReset = std::chrono::steady_clock::now() + WAIT_BEFORE_RESET;
             resetPending = true;
         }
     }
