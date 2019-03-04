@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.9x)
 project(GravSaverNG)
 
 set(BUILD_SHARED_LIBS false)
+set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(SFML-2.5.1)
 add_subdirectory(simplefilewatcher)

@@ -5,11 +5,14 @@
 #include <vector>
 #include <thread>
 #include <chrono>
+#include <filesystem>
 #include <SFML/Graphics.hpp>
 
 #include "shader_header.h"
 
 static auto startT = std::chrono::steady_clock::now();
+
+namespace fs = std::experimental::filesystem;
 
 void _main(std::vector<std::string> args) {
     FW::FileWatcher fw;
@@ -33,11 +36,12 @@ void _main(std::vector<std::string> args) {
     window.setFramerateLimit(0);
 
     sf::Shader shader;
-    sf::Shader vShader;
-    if (!shader.loadFromMemory(shaderHeader + fractalShader, sf::Shader::Type::Fragment)) {
-        std::cerr << "FAILED TO LOAD SHADER " << std::endl;
+    for (const auto & shaderFile : fs::directory_iterator(args[1])) {
+        if (!shader.loadFromMemory(shaderHeader + fractalShader, sf::Shader::Type::Fragment)) {
+            std::cerr << "FAILED TO LOAD SHADER " << std::endl;
+        }
+        std::cout << "LOADED" << std::endl;
     }
-    std::cout << "LOADED" << std::endl;
     
 
     sf::RenderTexture tex;
