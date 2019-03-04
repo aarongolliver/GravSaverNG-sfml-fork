@@ -36,8 +36,11 @@
 #include <SFML/System/Mutex.hpp>
 #include <SFML/System/Lock.hpp>
 #include <SFML/System/Err.hpp>
+#include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
+#include <regex>
 
 
 #ifndef SFML_OPENGL_ES
@@ -822,9 +825,33 @@ bool Shader::isGeometryAvailable()
 }
 
 
-static void printCompileErrorLog(const char* type, const char* log) {
-    err() << "Failed to compile " << type << " shader:" << std::endl
-        << log << std::endl;
+static void printCompileErrorLog(std::string type, std::string log, std::string source) {
+    std::istringstream logStream{ log };
+    std::istringstream sourceStream{ source };
+    std::vector<std::string> logLines;
+    std::vector<std::string> sourceLines;
+    {
+        std::string line;
+        while (std::getline(logStream, line, '\n')) {
+            if(!line.empty())
+                logLines.emplace_back(move(line));
+        }
+        while (std::getline(sourceStream, line, '\n')) {
+            sourceLines.emplace_back(move(line));
+        }
+    }
+
+    std::regex e(" \\d+:(\\d+):");
+
+    err() << "Failed to compile " << type << " shader:" << std::endl;
+    for (auto line : logLines) {
+        err() << line << std::endl;
+        std::smatch m;
+        std::regex_search(line, m, e);
+        auto linePos = atoi(m[1].str().c_str());
+        err() << sourceLines[linePos - 1] << std::endl;
+        err() << std::endl;
+    }
 }
 
 ////////////////////////////////////////////////////////////
@@ -882,7 +909,7 @@ bool Shader::compile(const char* vertexShaderCode, const char* geometryShaderCod
             std::unique_ptr<char[]> log = std::make_unique<char[]>(maxLogSize);
             glCheck(GLEXT_glGetInfoLog(vertexShader, maxLogSize, 0, log.get()));
 
-            printCompileErrorLog("vertex", log.get());
+            printCompileErrorLog("vertex", log.get(), vertexShaderCode);
 
             glCheck(GLEXT_glDeleteObject(vertexShader));
             glCheck(GLEXT_glDeleteObject(shaderProgram));
@@ -910,7 +937,7 @@ bool Shader::compile(const char* vertexShaderCode, const char* geometryShaderCod
             size_t maxLogSize = 65536;
             std::unique_ptr<char[]> log = std::make_unique<char[]>(maxLogSize);
             glCheck(GLEXT_glGetInfoLog(geometryShader, maxLogSize, 0, log.get()));
-            printCompileErrorLog("geometry", log.get());
+            printCompileErrorLog("geometry", log.get(), geometryShaderCode);
             glCheck(GLEXT_glDeleteObject(geometryShader));
             glCheck(GLEXT_glDeleteObject(shaderProgram));
             return false;
@@ -938,7 +965,7 @@ bool Shader::compile(const char* vertexShaderCode, const char* geometryShaderCod
             size_t maxLogSize = 65536;
             std::unique_ptr<char[]> log = std::make_unique<char[]>(maxLogSize);
             glCheck(GLEXT_glGetInfoLog(fragmentShader, maxLogSize, 0, log.get()));
-            printCompileErrorLog("fragment", log.get());
+            printCompileErrorLog("fragment", log.get(), fragmentShaderCode);
             glCheck(GLEXT_glDeleteObject(fragmentShader));
             glCheck(GLEXT_glDeleteObject(shaderProgram));
             return false;
