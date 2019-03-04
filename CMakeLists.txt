@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13x)
+cmake_minimum_required(VERSION 3.9x)
 
 project(GravSaverNG)
 
