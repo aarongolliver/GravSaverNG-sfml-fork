@@ -822,6 +822,11 @@ bool Shader::isGeometryAvailable()
 }
 
 
+static void printCompileErrorLog(const char* type, const char* log) {
+    err() << "Failed to compile " << type << " shader:" << std::endl
+        << log << std::endl;
+}
+
 ////////////////////////////////////////////////////////////
 bool Shader::compile(const char* vertexShaderCode, const char* geometryShaderCode, const char* fragmentShaderCode)
 {
@@ -873,10 +878,12 @@ bool Shader::compile(const char* vertexShaderCode, const char* geometryShaderCod
         glCheck(GLEXT_glGetObjectParameteriv(vertexShader, GLEXT_GL_OBJECT_COMPILE_STATUS, &success));
         if (success == GL_FALSE)
         {
-            char log[1024];
-            glCheck(GLEXT_glGetInfoLog(vertexShader, sizeof(log), 0, log));
-            err() << "Failed to compile vertex shader:" << std::endl
-                  << log << std::endl;
+            size_t maxLogSize = 65536;
+            std::unique_ptr<char[]> log = std::make_unique<char[]>(maxLogSize);
+            glCheck(GLEXT_glGetInfoLog(vertexShader, maxLogSize, 0, log.get()));
+
+            printCompileErrorLog("vertex", log.get());
+
             glCheck(GLEXT_glDeleteObject(vertexShader));
             glCheck(GLEXT_glDeleteObject(shaderProgram));
             return false;
@@ -900,10 +907,10 @@ bool Shader::compile(const char* vertexShaderCode, const char* geometryShaderCod
         glCheck(GLEXT_glGetObjectParameteriv(geometryShader, GLEXT_GL_OBJECT_COMPILE_STATUS, &success));
         if (success == GL_FALSE)
         {
-            char log[1024];
-            glCheck(GLEXT_glGetInfoLog(geometryShader, sizeof(log), 0, log));
-            err() << "Failed to compile geometry shader:" << std::endl
-                  << log << std::endl;
+            size_t maxLogSize = 65536;
+            std::unique_ptr<char[]> log = std::make_unique<char[]>(maxLogSize);
+            glCheck(GLEXT_glGetInfoLog(geometryShader, maxLogSize, 0, log.get()));
+            printCompileErrorLog("geometry", log.get());
             glCheck(GLEXT_glDeleteObject(geometryShader));
             glCheck(GLEXT_glDeleteObject(shaderProgram));
             return false;
@@ -928,10 +935,10 @@ bool Shader::compile(const char* vertexShaderCode, const char* geometryShaderCod
         glCheck(GLEXT_glGetObjectParameteriv(fragmentShader, GLEXT_GL_OBJECT_COMPILE_STATUS, &success));
         if (success == GL_FALSE)
         {
-            char log[1024];
-            glCheck(GLEXT_glGetInfoLog(fragmentShader, sizeof(log), 0, log));
-            err() << "Failed to compile fragment shader:" << std::endl
-                  << log << std::endl;
+            size_t maxLogSize = 65536;
+            std::unique_ptr<char[]> log = std::make_unique<char[]>(maxLogSize);
+            glCheck(GLEXT_glGetInfoLog(fragmentShader, maxLogSize, 0, log.get()));
+            printCompileErrorLog("fragment", log.get());
             glCheck(GLEXT_glDeleteObject(fragmentShader));
             glCheck(GLEXT_glDeleteObject(shaderProgram));
             return false;

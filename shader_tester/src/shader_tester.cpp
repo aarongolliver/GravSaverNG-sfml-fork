@@ -31,11 +31,12 @@ void _main(std::vector<std::string> args) {
     window.setFramerateLimit(0);
 
     sf::Shader shader;
+    sf::Shader vShader;
     {
         bool loop;
         do {
             clearcmd();
-            loop = !shader.loadFromFile("c:/Users/aaron/desktop/shaders/test.glsl", sf::Shader::Type::Fragment);
+            loop = !shader.loadFromFile("C:\\Users\\aaron\\Desktop\\shaders\\quaternion-fractal\\fractal.glsl", sf::Shader::Type::Fragment);
             if (loop) {
                 std::cerr << "COULD NOT LOAD SHADER" << std::endl;
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -48,13 +49,14 @@ void _main(std::vector<std::string> args) {
     sf::RenderTexture tex;
     tex.create(window.getSize().x, window.getSize().y);
     bool flip = true;
+    sf::Glsl::Vec2 mousePos = { window.getSize().x/2.f, window.getSize().y/2.f };
     while (window.isOpen()) {
         window.clear();
         tex.clear();
         const auto& size = window.getSize();
         shader.setUniform("iTime", (std::chrono::steady_clock::now() - startT).count() * 1.f / std::chrono::steady_clock::period::den);
         shader.setUniform("iResolution", sf::Glsl::Vec2(size));
-        shader.setUniform("iMouse", sf::Glsl::Vec2(size.x / 3.f, size.y/3.f));
+        shader.setUniform("iMouse", mousePos);
         shader.setUniform("_flip", flip);
         flip = false;
 
@@ -65,7 +67,7 @@ void _main(std::vector<std::string> args) {
         window.draw(currentSprite);
 
         window.display();
-
+        static bool mouseEnabled = false;
         sf::Event e;
         while (window.pollEvent(e)) {
             if (e.type == sf::Event::Closed) {
@@ -81,13 +83,21 @@ void _main(std::vector<std::string> args) {
                 tex.create(e.size.width, e.size.height);
                 flip = true;
             }
+            if (e.type == sf::Event::MouseButtonPressed && e.mouseButton.button == sf::Mouse::Button::Left)
+                mouseEnabled = true;
+            if (e.type == sf::Event::MouseButtonReleased && e.mouseButton.button == sf::Mouse::Button::Left)
+                mouseEnabled = false;
+            if (e.type == sf::Event::MouseMoved) {
+                if(mouseEnabled)
+                mousePos = { e.mouseMove.x * 1.f, e.mouseMove.y *  1.f };
+            }
         }
         {
             bool loop;
             if (check_changed()) {
                 do {
                     clearcmd();
-                    loop = !shader.loadFromFile("c:/Users/aaron/desktop/shaders/test.glsl", sf::Shader::Type::Fragment);
+                    loop = !shader.loadFromFile("C:\\Users\\aaron\\Desktop\\shaders\\quaternion-fractal\\fractal.glsl", sf::Shader::Type::Fragment);
                     if (loop) {
                         std::cerr << "COULD NOT LOAD SHADER" << std::endl;
                         std::this_thread::sleep_for(std::chrono::milliseconds(100));
