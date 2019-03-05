@@ -12,7 +12,7 @@
 
 static auto startT = std::chrono::steady_clock::now();
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 void _main(std::vector<std::string> args) {
     FW::FileWatcher fw;
@@ -31,7 +31,7 @@ void _main(std::vector<std::string> args) {
         }
         return false;
     };
-    sf::RenderWindow window({ 512, 512 }, "shader toy", sf::Style::Resize);
+    sf::RenderWindow window({ 1080, 1080}, "shader toy", sf::Style::Resize);
     window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(0);
 
@@ -57,7 +57,9 @@ void _main(std::vector<std::string> args) {
 
         const auto& currentTexture = tex.getTexture();
         sf::Sprite currentSprite(currentTexture);
-        tex.draw(currentSprite, &shader);
+        sf::RenderStates renderStates(&shader);
+        renderStates.blendMode = { sf::BlendMode::One, sf::BlendMode::One };
+        tex.draw(currentSprite, renderStates);
         tex.display();
         window.draw(currentSprite);
 
