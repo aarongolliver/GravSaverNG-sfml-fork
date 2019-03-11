@@ -29,6 +29,8 @@ add_executable(shader_tester
     shader_tester/src/file_watcher.h
     shader_tester/src/file_watcher.cpp
     shader_tester/src/scope.h
+    shader_tester/src/live_reloading_shader.cpp
+    shader_tester/src/live_reloading_shader.h
 )
 
 target_include_directories(simplefilewatcher PRIVATE
