@@ -2,7 +2,8 @@
 
 #include <string>
 
-std::string shaderHeader = "#version 450\n\
+namespace {
+    std::string shaderHeader = "#version 450\n\
 \n\
 uniform vec2      iResolution;           // viewport resolution (in pixels)\n\
 uniform float     iTime;                 // shader playback time (in seconds)\n\
@@ -18,4 +19,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord);\n\
 void main() {\n\
 mainImage(gl_FragColor, gl_FragCoord.xy);\n\
 }\n\
+#####$$$$$ END HEADER $$$$$#####\n\
 ";
+}
