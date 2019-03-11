@@ -1,10 +1,7 @@
-//#define SUPERSAMP
-
 struct quaternion
 {
     vec4 d;
 };
-
 
 quaternion qtimes(in quaternion a, in quaternion b){
     float y0 = dot(a.d.xyzw, b.d.xyzw * vec4(1., -1., -1., -1.));
@@ -205,11 +202,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     float e_y = rad * cos(iTime / cam_slow);
     float e_z = 0.;
 
-    #ifdef SUPERSAMP
-    float SS = 2.;
-    #else
     float SS = 1.;
-    #endif
     
     float l = -iResolution.x * SS;
     float r =  iResolution.x * SS;
@@ -237,11 +230,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     c.d.w = bandIntensity3/1.5;
     
     TOTAL_COLOR += do_everything(e, w, u, v, c, l, r, t, b, d, 0., 0., fragCoord);
-    #ifdef SUPERSAMP
-    TOTAL_COLOR += do_everything(e, w, u, v, c, l, r, t, b, d, 1./SS, 0., fragCoord);
-    TOTAL_COLOR += do_everything(e, w, u, v, c, l, r, t, b, d, 1./SS, 1./SS, fragCoord);
-    TOTAL_COLOR += do_everything(e, w, u, v, c, l, r, t, b, d, 0., 1./SS, fragCoord);
-    #endif
 
     fragColor = TOTAL_COLOR / vec4(SS*SS);
+    //fragColor = vec4(iMouse.x / iResolution.x,iMouse.y / iResolution.y,0,1);
 }

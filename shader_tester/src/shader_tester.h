@@ -1,22 +1,11 @@
 #pragma once
 
-#include <FileWatcher/FileWatcher.h>
 #include <windows.h>
+#include <string>
+#include <fstream>
+#include <streambuf>
 
 namespace {
-
-    template<typename T>
-    class LambdaWatcher : public FW::FileWatchListener {
-        const T _func;
-    public:
-        LambdaWatcher(T& func) : _func(func) {
-        }
-        ~LambdaWatcher() override = default;
-        void handleFileAction(FW::WatchID, const FW::String&, const FW::String&, FW::Action) override {
-            _func();
-        }
-    };
-
     void ClearCmd() {
         COORD topLeft = { 0, 0 };
         HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -32,5 +21,11 @@ namespace {
             screen.dwSize.X * screen.dwSize.Y, topLeft, &written
         );
         SetConsoleCursorPosition(console, topLeft);
+    }
+
+    std::string LoadFile(const std::string& path) {
+        std::ifstream inputFileStream(path);
+        return std::string{ std::istreambuf_iterator<char>(inputFileStream),
+            std::istreambuf_iterator<char>() };
     }
 }

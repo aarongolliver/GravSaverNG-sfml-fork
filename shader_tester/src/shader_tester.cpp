@@ -9,6 +9,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "shader_header.h"
+#include "file_watcher.h"
 
 static auto startT = std::chrono::steady_clock::now();
 
@@ -18,32 +19,26 @@ namespace fs = std::experimental::filesystem;
 namespace fs = std::filesystem;
 #endif
 
+using namespace std::chrono_literals;
+
 void _main(std::vector<std::string> args) {
-    FW::FileWatcher fw;
-    bool changed = false;
-    auto f = [&]() {
-        changed = true;
-    };
-    LambdaWatcher<decltype(f)> watcher(f);
-    fw.addWatch(args[1], &watcher);
-    auto check_changed = [&]() {
-        fw.update();
-        if (changed)
-        {
-            changed = false;
-            return true;
-        }
-        return false;
-    };
-    sf::RenderWindow window({ 1080, 1080}, "shader toy", sf::Style::Resize);
+    SimpleFileWatcher fw(args[1]);
+    sf::RenderWindow window({ 512, 512}, "shader toy", sf::Style::Resize);
     window.setVerticalSyncEnabled(true);
     window.setFramerateLimit(0);
 
     sf::Shader shader;
     for (const auto & shaderFile : fs::directory_iterator(args[1])) {
-        if (!shader.loadFromMemory(shaderHeader + fractalShader, sf::Shader::Type::Fragment)) {
-            std::cerr << "FAILED TO LOAD SHADER " << std::endl;
-        }
+        bool success = false;
+        do {
+            success = shader.loadFromMemory(shaderHeader + LoadFile(shaderFile.path().generic_string()), sf::Shader::Type::Fragment);
+            if (!success) {
+                std::cerr << "FAILED TO LOAD SHADER " << std::endl;
+                std::this_thread::sleep_for(100ms);
+                ClearCmd();
+            }
+        } while (!success);
+        ClearCmd();
         std::cout << "LOADED" << std::endl;
     }
     
@@ -90,6 +85,21 @@ void _main(std::vector<std::string> args) {
             if (e.type == sf::Event::MouseMoved) {
                 if(mouseEnabled)
                 mousePos = { e.mouseMove.x * 1.f, e.mouseMove.y *  1.f };
+            }
+        }
+        if (fw.CheckChanged()) {
+            for (const auto & shaderFile : fs::directory_iterator(args[1])) {
+                bool success = false;
+                do {
+                    success = shader.loadFromMemory(shaderHeader + LoadFile(shaderFile.path().generic_string()), sf::Shader::Type::Fragment);
+                    if (!success) {
+                        std::cerr << "FAILED TO LOAD SHADER " << std::endl;
+                        std::this_thread::sleep_for(100ms);
+                        ClearCmd();
+                    }
+                } while (!success);
+                ClearCmd();
+                std::cout << "LOADED" << std::endl;
             }
         }
     }
