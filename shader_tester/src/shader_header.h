@@ -1,6 +1,18 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <tuple>
+#include <filesystem>
+#include <memory>
+#include "live_reloading_shader.h"
+
+#ifdef _EXPERIMENTAL_FILESYSTEM_
+namespace fs = std::experimental::filesystem;
+#else
+namespace fs = std::filesystem;
+#endif
+
 
 namespace {
     std::string shaderHeader = "#version 450\n\
@@ -19,6 +31,8 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord);\n\
 void main() {\n\
 mainImage(gl_FragColor, gl_FragCoord.xy);\n\
 }\n\
-#####$$$$$ END HEADER $$$$$#####\n\
 ";
+    std::string headerEnd = "//#####$$$$$ END HEADER $$$$$#####//\n";
+
 }
+

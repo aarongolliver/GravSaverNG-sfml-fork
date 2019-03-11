@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <memory>
 #include "file_watcher.h"
+#include <vector>
 #include <SFML/Graphics.hpp>
 
 namespace sf { class RenderWindow; }
@@ -16,8 +17,11 @@ namespace fs = std::filesystem;
 
 class LiveReloadingShader {
 public:
-    LiveReloadingShader(const fs::path& path);
+    LiveReloadingShader(const fs::path& path, std::vector<std::pair<fs::path, std::unique_ptr<LiveReloadingShader>>>& shaders);
     ~LiveReloadingShader();
+
+    std::string GetTextureName() const;
+    const sf::Texture& GetPreviousFrameTexture() const;
 
     void Tick();
 
@@ -27,10 +31,14 @@ private:
     SimpleFileWatcher fw;
 
     sf::Shader shader;
-    sf::RenderTexture texture;
+    sf::RenderTexture currentFrame;
+    sf::RenderTexture previousFrame;
     sf::Vector2f mousePos;
 
     bool mouseEnabled;
+
+    std::vector<std::pair<fs::path, std::unique_ptr<LiveReloadingShader>>>& shaders;
+    const std::string textureHeaders;
 
 public:
     bool windowClosed;

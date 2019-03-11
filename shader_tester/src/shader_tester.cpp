@@ -1,13 +1,13 @@
 #include "shader_tester.h"
 
+#include "shader_header.h"
+
 #include <string>
 #include <iostream>
 #include <vector>
 #include <memory>
 #include <filesystem>
-#include <unordered_map>
-
-#include "live_reloading_shader.h"
+#include <tuple>
 
 #ifdef _EXPERIMENTAL_FILESYSTEM_
 namespace fs = std::experimental::filesystem;
@@ -18,9 +18,13 @@ namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 
 void _main(std::vector<std::string> args) {
-    std::unordered_map<std::string, std::unique_ptr<LiveReloadingShader>> shaders;
+    std::vector<std::pair<fs::path, std::unique_ptr<LiveReloadingShader>>> shaders;
     for (const auto & shaderFile : fs::directory_iterator(args[1])) {
-        shaders.emplace(shaderFile.path().generic_string(), std::make_unique<LiveReloadingShader>(shaderFile.path()));
+        shaders.emplace_back(std::make_pair(shaderFile.path(), nullptr));
+    }
+
+    for (auto& shader : shaders) {
+        shader.second = std::make_unique<LiveReloadingShader>(shader.first, shaders);
     }
 
     while (1) {
