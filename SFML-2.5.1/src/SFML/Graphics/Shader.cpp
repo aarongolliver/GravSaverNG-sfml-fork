@@ -848,9 +848,11 @@ static void printCompileErrorLog(std::string type, std::string log, std::string 
         err() << line << std::endl;
         std::smatch m;
         std::regex_search(line, m, e);
-        auto linePos = atoi(m[1].str().c_str());
-        err() << sourceLines[linePos - 1] << std::endl;
-        err() << std::endl;
+        if (m.size() > 2) {
+            auto linePos = atoi(m[1].str().c_str());
+            err() << sourceLines[linePos - 1] << std::endl;
+            err() << std::endl;
+        }
     }
 }
 
