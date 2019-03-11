@@ -12,7 +12,11 @@
 
 static auto startT = std::chrono::steady_clock::now();
 
+#ifdef _EXPERIMENTAL_FILESYSTEM_
+namespace fs = std::experimental::filesystem;
+#else
 namespace fs = std::filesystem;
+#endif
 
 void _main(std::vector<std::string> args) {
     FW::FileWatcher fw;
@@ -92,20 +96,12 @@ void _main(std::vector<std::string> args) {
 
 }
 
-
-
-
-
-
-
-
-
-
 int main(int argc, char** argv) {
     std::vector<std::string> args;
     for (int i = 0; i < argc; ++i) {
         args.emplace_back(argv[i]);
     }
+
     _main(std::move(args));
 
     return EXIT_SUCCESS;
