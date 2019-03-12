@@ -907,7 +907,7 @@ bool Shader::compile(const char* vertexShaderCode, const char* geometryShaderCod
         glCheck(GLEXT_glGetObjectParameteriv(vertexShader, GLEXT_GL_OBJECT_COMPILE_STATUS, &success));
         if (success == GL_FALSE)
         {
-            size_t maxLogSize = 65536;
+            GLsizei maxLogSize = 65536;
             std::unique_ptr<char[]> log = std::make_unique<char[]>(maxLogSize);
             glCheck(GLEXT_glGetInfoLog(vertexShader, maxLogSize, 0, log.get()));
 
