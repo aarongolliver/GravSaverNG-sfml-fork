@@ -17,11 +17,11 @@ namespace {
     std::string SanatizeTextureName(const std::string& stem) {
         std::string ret;
         for (const auto& c : stem) {
-            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_')) {
                 ret += c;
             }
         }
-        return ret;
+        return "texture_" + ret;
     }
 
     std::string GetTextureNames(const std::vector<std::pair<fs::path, std::unique_ptr<LiveReloadingShader>>>& shaders) {
@@ -48,7 +48,22 @@ LiveReloadingShader::LiveReloadingShader(const fs::path& _shaderPath, std::vecto
     window->setFramerateLimit(0);
     previousFrame.create(window->getSize().x, window->getSize().y);
     currentFrame.create(window->getSize().x, window->getSize().y);
+}
 
+LiveReloadingShader::~LiveReloadingShader() {
+    window->close();
+}
+
+void LiveReloadingShader::UpdatePreviousFrame() {
+    previousFrame.clear();
+    sf::Sprite previousFrameSprite(currentFrame.getTexture());
+    sf::RenderStates renderStates;
+    renderStates.blendMode = { sf::BlendMode::One, sf::BlendMode::One };
+    previousFrame.draw(previousFrameSprite, renderStates);
+    previousFrame.display();
+}
+
+void LiveReloadingShader::UpdateShader() {
     bool success = false;
     do {
         success = shader.loadFromMemory(shaderHeader + textureHeaders + headerEnd + LoadFile(shaderPath.generic_string()), sf::Shader::Type::Fragment);
@@ -60,19 +75,8 @@ LiveReloadingShader::LiveReloadingShader(const fs::path& _shaderPath, std::vecto
     std::cout << "LOADED: " << shaderPath.stem().generic_string() << std::endl;
 }
 
-LiveReloadingShader::~LiveReloadingShader() {
-    window->close();
-}
-
 void LiveReloadingShader::Tick() {
     window->clear();
-    {
-        previousFrame.clear();
-        sf::Sprite previousFrameSprite(currentFrame.getTexture());
-        previousFrame.draw(previousFrameSprite);
-        previousFrame.display();
-    }
-
     currentFrame.clear();
     const auto& size = window->getSize();
     shader.setUniform("iTime", (std::chrono::steady_clock::now() - startT).count() * 1.f / std::chrono::steady_clock::period::den);
@@ -117,17 +121,6 @@ void LiveReloadingShader::Tick() {
             if (mouseEnabled)
                 mousePos = { e.mouseMove.x * 1.f / window->getSize().x, e.mouseMove.y *  1.f / window->getSize().y };
         }
-    }
-    if (fw.CheckChanged()) {
-        bool success = false;
-        do {
-            success = shader.loadFromMemory(shaderHeader + textureHeaders + headerEnd + LoadFile(shaderPath.generic_string()), sf::Shader::Type::Fragment);
-            if (!success) {
-                std::cerr << "FAILED TO LOAD SHADER: " << shaderPath.stem().generic_string() << std::endl;
-                std::this_thread::sleep_for(100ms);
-            }
-        } while (!success);
-        std::cout << "LOADED: " << shaderPath.stem().generic_string() << std::endl;
     }
 }
 
