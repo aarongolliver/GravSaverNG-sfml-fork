@@ -936,7 +936,7 @@ bool Shader::compile(const char* vertexShaderCode, const char* geometryShaderCod
         glCheck(GLEXT_glGetObjectParameteriv(geometryShader, GLEXT_GL_OBJECT_COMPILE_STATUS, &success));
         if (success == GL_FALSE)
         {
-            size_t maxLogSize = 65536;
+            GLsizei maxLogSize = 65536;
             std::unique_ptr<char[]> log = std::make_unique<char[]>(maxLogSize);
             glCheck(GLEXT_glGetInfoLog(geometryShader, maxLogSize, 0, log.get()));
             printCompileErrorLog("geometry", log.get(), geometryShaderCode);
@@ -964,7 +964,7 @@ bool Shader::compile(const char* vertexShaderCode, const char* geometryShaderCod
         glCheck(GLEXT_glGetObjectParameteriv(fragmentShader, GLEXT_GL_OBJECT_COMPILE_STATUS, &success));
         if (success == GL_FALSE)
         {
-            size_t maxLogSize = 65536;
+            GLsizei maxLogSize = 65536;
             std::unique_ptr<char[]> log = std::make_unique<char[]>(maxLogSize);
             glCheck(GLEXT_glGetInfoLog(fragmentShader, maxLogSize, 0, log.get()));
             printCompileErrorLog("fragment", log.get(), fragmentShaderCode);
