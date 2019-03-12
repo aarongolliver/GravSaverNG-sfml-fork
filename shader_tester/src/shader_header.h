@@ -7,11 +7,7 @@
 #include <memory>
 #include "live_reloading_shader.h"
 
-<<<<<<< HEAD
 #if !_HAS_CXX17
-=======
-#ifndef _HAS_CXX17
->>>>>>> use cxx17 macro instead
 namespace fs = std::experimental::filesystem;
 #else
 namespace fs = std::filesystem;
