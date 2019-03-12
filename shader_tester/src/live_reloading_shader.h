@@ -22,6 +22,8 @@ public:
 
     std::string GetTextureName() const;
     const sf::Texture& GetPreviousFrameTexture() const;
+    void UpdatePreviousFrame();
+    void UpdateShader();
 
     void Tick();
 

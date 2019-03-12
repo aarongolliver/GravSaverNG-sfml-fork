@@ -232,5 +232,5 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     TOTAL_COLOR += do_everything(e, w, u, v, c, l, r, t, b, d, 0., 0., fragCoord);
 
     fragColor = TOTAL_COLOR / vec4(SS*SS);
-    //fragColor = vec4(iMouse.x / iResolution.x,iMouse.y / iResolution.y,0,1);
+    fragColor = vec4(fragCoord / iResolution,0,1);
 }
