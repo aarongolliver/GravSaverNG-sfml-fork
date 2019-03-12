@@ -11,7 +11,7 @@
 #include <thread>
 #include <chrono>
 
-#ifndef _HAS_CXX17
+#if !_HAS_CXX17
 namespace fs = std::experimental::filesystem;
 #else
 namespace fs = std::filesystem;
