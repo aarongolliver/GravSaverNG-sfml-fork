@@ -53,13 +53,11 @@ LiveReloadingShader::LiveReloadingShader(const fs::path& _shaderPath, std::vecto
     do {
         success = shader.loadFromMemory(shaderHeader + textureHeaders + headerEnd + LoadFile(shaderPath.generic_string()), sf::Shader::Type::Fragment);
         if (!success) {
-            std::cerr << "FAILED TO LOAD SHADER " << std::endl;
+            std::cerr << "FAILED TO LOAD SHADER: " << shaderPath.stem().generic_string() << std::endl;
             std::this_thread::sleep_for(100ms);
-            ClearCmd();
         }
     } while (!success);
-    ClearCmd();
-    std::cout << "LOADED: " << shaderPath.generic_string() << std::endl;
+    std::cout << "LOADED: " << shaderPath.stem().generic_string() << std::endl;
 }
 
 LiveReloadingShader::~LiveReloadingShader() {
@@ -69,6 +67,7 @@ LiveReloadingShader::~LiveReloadingShader() {
 void LiveReloadingShader::Tick() {
     window->clear();
     {
+        previousFrame.clear();
         sf::Sprite previousFrameSprite(currentFrame.getTexture());
         previousFrame.draw(previousFrameSprite);
         previousFrame.display();
@@ -81,7 +80,9 @@ void LiveReloadingShader::Tick() {
     shader.setUniform("iMouse", sf::Glsl::Vec2(mousePos.x * size.x, mousePos.y * size.y));
 
     for (const auto& otherShader : shaders) {
-        shader.setUniform(otherShader.second->GetTextureName(), otherShader.second->GetPreviousFrameTexture());
+        const auto& name = otherShader.second->GetTextureName();
+        const auto& tex = otherShader.second->GetPreviousFrameTexture();
+        shader.setUniform(name, tex);
     }
 
     sf::Sprite currentSprite(currentFrame.getTexture());
@@ -122,13 +123,11 @@ void LiveReloadingShader::Tick() {
         do {
             success = shader.loadFromMemory(shaderHeader + textureHeaders + headerEnd + LoadFile(shaderPath.generic_string()), sf::Shader::Type::Fragment);
             if (!success) {
-                std::cerr << "FAILED TO LOAD SHADER " << std::endl;
+                std::cerr << "FAILED TO LOAD SHADER: " << shaderPath.stem().generic_string() << std::endl;
                 std::this_thread::sleep_for(100ms);
-                ClearCmd();
             }
         } while (!success);
-        ClearCmd();
-        std::cout << "LOADED" << std::endl;
+        std::cout << "LOADED: " << shaderPath.stem().generic_string() << std::endl;
     }
 }
 
