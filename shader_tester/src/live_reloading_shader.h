@@ -9,7 +9,7 @@
 
 namespace sf { class RenderWindow; }
 
-#ifdef _EXPERIMENTAL_FILESYSTEM_
+#if !_HAS_CXX17
 namespace fs = std::experimental::filesystem;
 #else
 namespace fs = std::filesystem;
