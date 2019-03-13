@@ -37,12 +37,13 @@ namespace {
 LiveReloadingShader::LiveReloadingShader(const fs::path& _shaderPath, std::vector<std::pair<fs::path, std::unique_ptr<LiveReloadingShader>>>& _shaders)
     : shaderPath(_shaderPath)
     , fw(_shaderPath.parent_path().generic_string())
-    , window(std::make_unique<sf::RenderWindow>(sf::VideoMode{ 512, 512 }, _shaderPath.generic_string(), sf::Style::Titlebar))
+    , window(std::make_unique<sf::RenderWindow>(sf::VideoMode{ 512, 512 }, _shaderPath.stem().generic_string(), sf::Style::Titlebar))
     , mousePos(.5, .5)
     , mouseEnabled(false)
     , windowClosed(false)
     , shaders(_shaders)
     , textureHeaders(GetTextureNames(shaders))
+    , lastT(std::chrono::steady_clock::now())
 {
     window->setVerticalSyncEnabled(true);
     window->setFramerateLimit(0);
@@ -79,7 +80,11 @@ void LiveReloadingShader::Tick() {
     window->clear();
     currentFrame.clear();
     const auto& size = window->getSize();
-    shader.setUniform("iTime", (std::chrono::steady_clock::now() - startT).count() * 1.f / std::chrono::steady_clock::period::den);
+    auto now = std::chrono::steady_clock::now();
+    shader.setUniform("iTime", (now - startT).count() * 1.f / std::chrono::steady_clock::period::den);
+    float timeDelta = (now - lastT).count() * 1.f / std::chrono::steady_clock::period::den;
+    shader.setUniform("iTimeDelta", timeDelta);
+    lastT = now;
     shader.setUniform("iResolution", sf::Glsl::Vec2(size));
     shader.setUniform("iMouse", sf::Glsl::Vec2(mousePos.x * size.x, mousePos.y * size.y));
 
