@@ -37,7 +37,7 @@ namespace {
 LiveReloadingShader::LiveReloadingShader(const fs::path& _shaderPath, std::vector<std::pair<fs::path, std::unique_ptr<LiveReloadingShader>>>& _shaders)
     : shaderPath(_shaderPath)
     , fw(_shaderPath.parent_path().generic_string())
-    , window(std::make_unique<sf::RenderWindow>(sf::VideoMode{ 512, 512 }, _shaderPath.stem().generic_string(), sf::Style::Titlebar))
+    , window(std::make_unique<sf::RenderWindow>(sf::VideoMode{ 512, 512 }, _shaderPath.stem().generic_string(), sf::Style::Resize))
     , mousePos(.5, .5)
     , mouseEnabled(false)
     , windowClosed(false)
