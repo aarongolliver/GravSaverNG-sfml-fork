@@ -40,7 +40,7 @@ float calcDistance(quaternion z, quaternion c){
     float keep_going = 1.;
 
 
-    for(float i = 0.; i < 12.; i++){
+    for(float i = 0.; i < 24.; i++){
         if(keep_going > 0.){
             dz = qtimes(2., qtimes(dz,z));
             z = qplus(qtimes(z,z), c);
@@ -66,7 +66,7 @@ vec3 make_abs(in vec3 v){
     return vec3(abs(v.x), abs(v.y), abs(v.z));
 }
 
-float cam_slow = 5.;
+float cam_slow = 25.;
 vec4 do_everything(in vec3 e,
                    in vec3 w,
                    in vec3 u,
@@ -96,7 +96,7 @@ vec4 do_everything(in vec3 e,
 
     float dist = init_dist;
 
-    const float max_iters = 64.;
+    const float max_iters = 80.;
     float marched_iters = 0.;
     float keep_going = 1.;
 
@@ -191,10 +191,10 @@ vec4 do_everything(in vec3 e,
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
-    float bandIntensity0 = .1;
-    float bandIntensity1 = .1;
-    float bandIntensity2 = .1;
-    float bandIntensity3 = .1;
+    float bandIntensity0 = 0;
+    float bandIntensity1 = 0;
+    float bandIntensity2 = 0;
+    float bandIntensity3 = 0;
 
     // ray generation
     float rad = 2.;
@@ -224,13 +224,12 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     vec3 v = normalize(cross(w, u));
 
     quaternion c;
-    c.d.x = (iMouse.x > 0. ? iMouse.x / iResolution.x * 2. - 1. : -1.0);
-    c.d.z = (iMouse.x > 0. ? iMouse.y / iResolution.y * 2. - 1. :  0.0);
-    c.d.y = bandIntensity2/1.5;
-    c.d.w = bandIntensity3/1.5;
+    c.d.x = texture2D(texture_x,vec2(0)).r * 2 - 1;
+    c.d.y = texture2D(texture_y,vec2(0)).r * 2 - 1;
+    c.d.z = texture2D(texture_z,vec2(0)).r * 2 - 1;
+    c.d.w = texture2D(texture_w,vec2(0)).r * 2 - 1;
     
     TOTAL_COLOR += do_everything(e, w, u, v, c, l, r, t, b, d, 0., 0., fragCoord);
 
     fragColor = TOTAL_COLOR / vec4(SS*SS);
-    //fragColor = vec4(fragCoord / iResolution,0,1);
 }

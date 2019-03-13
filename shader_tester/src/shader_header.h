@@ -19,7 +19,7 @@ namespace {
 \n\
 uniform vec2      iResolution;           // viewport resolution (in pixels)\n\
 uniform float     iTime;                 // shader playback time (in seconds)\n\
-//uniform float     iTimeDelta;            // render time (in seconds)\n\
+uniform float     iTimeDelta;            // render time (in seconds)\n\
 //uniform int       iFrame;                // shader playback frame\n\
 //uniform float     iChannelTime[4];       // channel playback time (in seconds)\n\
 //uniform vec3      iChannelResolution[4]; // channel resolution (in pixels)\n\
@@ -29,7 +29,7 @@ uniform vec2      iMouse;                // mouse pixel coords. xy: current (if 
 \n\
 void mainImage(out vec4 fragColor, in vec2 fragCoord);\n\
 void main() {\n\
-mainImage(gl_FragColor, gl_FragCoord.xy);\n\
+    mainImage(gl_FragColor, gl_FragCoord.xy);\n\
 }\n\
 ";
     std::string headerEnd = "//#####$$$$$ END HEADER $$$$$#####//\n";
