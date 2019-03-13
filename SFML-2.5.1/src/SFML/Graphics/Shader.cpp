@@ -841,7 +841,7 @@ static void printCompileErrorLog(std::string type, std::string log, std::string 
         }
     }
 
-    std::regex e(" \\d+:(\\d+):");
+    std::regex e("\\d+((\\d+))");
 
     err() << "Failed to compile " << type << " shader:" << std::endl;
     for (auto line : logLines) {
@@ -849,7 +849,7 @@ static void printCompileErrorLog(std::string type, std::string log, std::string 
         std::smatch m;
         std::regex_search(line, m, e);
         if (m.size() > 2) {
-            auto linePos = atoi(m[1].str().c_str());
+            auto linePos = atoi(m[0].str().c_str());
             err() << sourceLines[linePos - 1] << std::endl;
             err() << std::endl;
         }
