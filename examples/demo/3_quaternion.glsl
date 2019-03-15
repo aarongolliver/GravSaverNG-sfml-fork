@@ -66,7 +66,7 @@ vec3 make_abs(in vec3 v){
     return vec3(abs(v.x), abs(v.y), abs(v.z));
 }
 
-float cam_slow = 5.;
+float cam_slow = 25.;
 vec4 do_everything(in vec3 e,
                    in vec3 w,
                    in vec3 u,
@@ -232,5 +232,4 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     TOTAL_COLOR += do_everything(e, w, u, v, c, l, r, t, b, d, 0., 0., fragCoord);
 
     fragColor = TOTAL_COLOR / vec4(SS*SS);
-    //fragColor = vec4(fragCoord / iResolution,0,1);
 }
