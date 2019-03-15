@@ -66,7 +66,7 @@ vec3 make_abs(in vec3 v){
     return vec3(abs(v.x), abs(v.y), abs(v.z));
 }
 
-float cam_slow = 25.;
+float cam_slow = 4.;
 vec4 do_everything(in vec3 e,
                    in vec3 w,
                    in vec3 u,
@@ -143,9 +143,6 @@ vec4 do_everything(in vec3 e,
                                                 (dist_up   - dist_down)  / (2. * grad_delta),
                                                 (dist_for  - dist_bak)   / (2. * grad_delta))));
         
-        // done with gradiant
-
-
         vec3 light_pos = vec3(rad * sin(iTime / cam_slow), rad * cos(iTime / cam_slow), rad);
         
         vec3 ray_light_e = ray_e + ray_dir * vec3(dist * .99);

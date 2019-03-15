@@ -34,7 +34,8 @@ namespace {
 
 }
 
-static sf::ContextSettings cs;
+static sf::ContextSettings s_CS;
+
 LiveReloadingShader::LiveReloadingShader(const fs::path& _shaderPath, std::vector<std::pair<fs::path, std::unique_ptr<LiveReloadingShader>>>& _shaders)
     : shaderPath(_shaderPath)
     , fw(_shaderPath.parent_path().generic_string())
@@ -48,9 +49,9 @@ LiveReloadingShader::LiveReloadingShader(const fs::path& _shaderPath, std::vecto
 {
     window->setVerticalSyncEnabled(false);
     window->setFramerateLimit(0);
-    cs.antialiasingLevel = sf::RenderTexture::getMaximumAntialiasingLevel();;
-    previousFrame.create(window->getSize().x, window->getSize().y, cs);
-    currentFrame.create(window->getSize().x, window->getSize().y, cs);
+    s_CS.antialiasingLevel = sf::RenderTexture::getMaximumAntialiasingLevel();
+    previousFrame.create(window->getSize().x, window->getSize().y, s_CS);
+    currentFrame.create(window->getSize().x, window->getSize().y, s_CS);
 }
 
 LiveReloadingShader::~LiveReloadingShader() {
@@ -118,8 +119,8 @@ void LiveReloadingShader::Tick() {
         }
         if (e.type == sf::Event::Resized) {
             window->setView({ {e.size.width / 2.f, e.size.height / 2.f}, {1.f*e.size.width, 1.f*e.size.height} });
-            currentFrame.create(e.size.width, e.size.height, cs);
-            previousFrame.create(e.size.width, e.size.height, cs);
+            currentFrame.create(e.size.width, e.size.height, s_CS);
+            previousFrame.create(e.size.width, e.size.height, s_CS);
         }
         if (e.type == sf::Event::MouseButtonPressed && e.mouseButton.button == sf::Mouse::Button::Left)
             mouseEnabled = true;

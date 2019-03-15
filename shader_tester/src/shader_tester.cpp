@@ -20,7 +20,10 @@ namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 
 void _main(std::vector<std::string> args) {
-    const auto& projectDirectory = args[1];
+    auto path = fs::path{ args[1] };
+    if (path.has_extension())
+        path.remove_filename();
+    const auto& projectDirectory = path.generic_string();
 
     std::vector<std::pair<fs::path, std::unique_ptr<LiveReloadingShader>>> shaders;
     for (const auto & shaderFile : fs::directory_iterator(projectDirectory)) {
@@ -55,7 +58,8 @@ void _main(std::vector<std::string> args) {
             {
                 std::vector<fs::path> currentFileset;
                 for (const auto & shaderFile : fs::directory_iterator(projectDirectory)) {
-                    currentFileset.emplace_back(shaderFile.path());
+                    if(shaderFile.path().has_filename && shaderFile.path().filename() == "glsl")
+                        currentFileset.emplace_back(shaderFile.path());
                 }
 
                 // see if any of the currently loaded shaders are no longer in the folder

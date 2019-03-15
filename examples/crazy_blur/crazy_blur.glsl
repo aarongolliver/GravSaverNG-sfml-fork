@@ -15,7 +15,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     for(float t=-30.0; t<=30.0; t++) {
         float percent=(t+offset-0.5)/30.0;
         float weight=1.0-abs(percent);
-        vec4 s=texture2D(texture_quaternion,fragCoord/iResolution+delta*percent);
+        vec4 s=texture2D(texture_progress_bar,fragCoord/iResolution+delta*percent);
         s.rgb*=s.a;
         color+=s*weight;
         total+=weight;
