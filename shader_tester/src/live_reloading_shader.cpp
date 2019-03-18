@@ -17,7 +17,7 @@ namespace {
     std::string SanatizeTextureName(const std::string& stem) {
         std::string ret;
         for (const auto& c : stem) {
-            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_')) {
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_') || (c >= '0' && c <= '9')) {
                 ret += c;
             }
         }
@@ -47,11 +47,25 @@ LiveReloadingShader::LiveReloadingShader(const fs::path& _shaderPath, std::vecto
     , textureHeaders(GetTextureNames(shaders))
     , lastT(std::chrono::steady_clock::now())
 {
+    static int posX = 0, posY = 0;
+
     window->setVerticalSyncEnabled(false);
     window->setFramerateLimit(0);
     s_CS.antialiasingLevel = sf::RenderTexture::getMaximumAntialiasingLevel();
     previousFrame.create(window->getSize().x, window->getSize().y, s_CS);
     currentFrame.create(window->getSize().x, window->getSize().y, s_CS);
+
+    window->setPosition({ posX, posY });
+    if (posX > 1024) {
+        posX = 0;
+        posY += 512;
+    }
+    else {
+        posX += 512;
+    }
+    if (posY > 1024) {
+        posY = 0;
+    }
 }
 
 LiveReloadingShader::~LiveReloadingShader() {

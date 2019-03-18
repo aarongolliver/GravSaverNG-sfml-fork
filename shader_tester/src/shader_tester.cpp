@@ -50,6 +50,11 @@ void _main(std::vector<std::string> args) {
             std::cout << 1. / ((now - tSamplesAgo).count() * (1. / steady_clock::period::den) / (1. * t)) << std::endl;
             tSamplesAgo = now;
         }
+
+        if (shaders.empty()) {
+            std::this_thread::sleep_for(100ms);
+        }
+
         for (const auto& shader : shaders) {
             shader.second->UpdatePreviousFrame();
         }
@@ -58,8 +63,12 @@ void _main(std::vector<std::string> args) {
             {
                 std::vector<fs::path> currentFileset;
                 for (const auto & shaderFile : fs::directory_iterator(projectDirectory)) {
-                    if(shaderFile.path().has_filename && shaderFile.path().filename() == "glsl")
+                    if(shaderFile.path().has_extension() && shaderFile.path().extension() == ".glsl")
                         currentFileset.emplace_back(shaderFile.path());
+                }
+
+                if (currentFileset.size() != shaders.size()) {
+                    std::cout << "added or removed shaders, new size: " << currentFileset.size() << " old size: shaders.size()" << std::endl;
                 }
 
                 // see if any of the currently loaded shaders are no longer in the folder
