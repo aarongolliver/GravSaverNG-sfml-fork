@@ -39,6 +39,7 @@ private:
     sf::RenderTexture currentFrame;
     sf::RenderTexture previousFrame;
     sf::Vector2f mousePos;
+    sf::Vector2f size;
 
     bool mouseEnabled;
 
