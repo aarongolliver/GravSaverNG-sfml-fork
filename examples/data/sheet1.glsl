@@ -1,3 +1,5 @@
+float animate = 1;
+
 vec3 sliderColor = vec3(0, 122./255, 217./255);
 vec3 barColor = vec3(160./255);
 
@@ -13,7 +15,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     float bars = 5;
     float barHeight = 1./bars;
     for(int i = 0; i < bars; ++i) {
-        float x = abs(cos(i*5+3));
+        float x = abs(cos(i*5+3+animate*iTime/1*sin(1+i)));
         float y = i / bars + 1/bars/2.;
         if(frag.x < x) {
             if(frag.y > y - barHeight * size / 2 && frag.y < y + barHeight * size / 2) {
