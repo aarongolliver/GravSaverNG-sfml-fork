@@ -87,7 +87,8 @@ void LiveReloadingShader::UpdateShader() {
         success = shader.loadFromMemory(shaderHeader + textureHeaders + headerEnd + LoadFile(shaderPath.generic_string()), sf::Shader::Type::Fragment);
         if (!success) {
             std::cerr << "FAILED TO LOAD SHADER: " << shaderPath.stem().generic_string() << std::endl;
-            std::this_thread::sleep_for(100ms);
+            std::this_thread::sleep_for(1000ms);
+            ClearCmd();
         }
     } while (!success);
     std::cout << "LOADED: " << shaderPath.stem().generic_string() << std::endl;
