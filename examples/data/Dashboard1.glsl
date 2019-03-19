@@ -1,3 +1,14 @@
+vec3 sliderColor = vec3(0, 122./255, 217./255);
+vec3 barColor = vec3(160./255);
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    fragColor = vec4(1);
+
+    float mouseX = clamp((iMouse/iResolution).x, 0, 1);
+    vec2 frag = fragCoord/iResolution;
+    vec3 color = texture(texture_color_picker, vec2(0,0)).rgb;
+    float size = texture(texture_size, vec2(0,0)).x;
 
     #define points 100
     #define PI 3.141590
@@ -20,3 +31,5 @@
     fragColor = vec4(1);
     if(frag.y < .01)
     fragColor = vec4(1);
+
+}
