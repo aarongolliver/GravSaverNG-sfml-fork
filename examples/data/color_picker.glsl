@@ -27,7 +27,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     vec2 frag = fragCoord/iResolution;
     vec2 mouse = iMouse/iResolution;
 
-    if(fragCoord.x < 10 && fragCoord.y < 10){
+    if(fragCoord.x < 1 && fragCoord.y < 1){
     	fragColor = texture(texture_color_picker, frag);
     	if(fragColor.r == 0)
     	    fragColor = vec4(box00color,1);
@@ -56,14 +56,14 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         fragColor = vec4(0);
     if(inBox(frag, box00))
         fragColor = vec4(box00color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box00) && fragCoord.x < 10 && fragCoord.y < 10)
+    if(inBox(abs(vec2(0, 1) - mouse), box00) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box00color, 1);
 
     if(inBox(frag, box10,.005))
         fragColor = vec4(0);
     if(inBox(frag, box10))
         fragColor = vec4(box10color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box10) && fragCoord.x < 10 && fragCoord.y < 10)
+    if(inBox(abs(vec2(0, 1) - mouse), box10) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box10color, 1);
 
 
@@ -71,35 +71,35 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         fragColor = vec4(0);
     if(inBox(frag, box20))
         fragColor = vec4(box20color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box20) && fragCoord.x < 10 && fragCoord.y < 10)
+    if(inBox(abs(vec2(0, 1) - mouse), box20) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box20color, 1);
 
     if(inBox(frag, box30,.005))
         fragColor = vec4(0);
     if(inBox(frag, box30))
         fragColor = vec4(box30color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box30) && fragCoord.x < 10 && fragCoord.y < 10)
+    if(inBox(abs(vec2(0, 1) - mouse), box30) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box30color, 1);
 
     if(inBox(frag, box40,.005))
         fragColor = vec4(0);
     if(inBox(frag, box40))
         fragColor = vec4(box40color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box40) && fragCoord.x < 10 && fragCoord.y < 10)
+    if(inBox(abs(vec2(0, 1) - mouse), box40) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box40color, 1);
 
     if(inBox(frag, box01,.005))
         fragColor = vec4(0);
     if(inBox(frag, box01))
         fragColor = vec4(box01color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box01) && fragCoord.x < 10 && fragCoord.y < 10)
+    if(inBox(abs(vec2(0, 1) - mouse), box01) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box01color, 1);
 
     if(inBox(frag, box11,.005))
         fragColor = vec4(0);
     if(inBox(frag, box11))
         fragColor = vec4(box11color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box11) && fragCoord.x < 10 && fragCoord.y < 10)
+    if(inBox(abs(vec2(0, 1) - mouse), box11) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box11color, 1);
 
 
@@ -107,20 +107,20 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         fragColor = vec4(0);
     if(inBox(frag, box21))
         fragColor = vec4(box21color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box21) && fragCoord.x < 10 && fragCoord.y < 10)
+    if(inBox(abs(vec2(0, 1) - mouse), box21) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box21color, 1);
 
     if(inBox(frag, box31,.005))
         fragColor = vec4(0);
     if(inBox(frag, box31))
         fragColor = vec4(box31color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box31) && fragCoord.x < 10 && fragCoord.y < 10)
+    if(inBox(abs(vec2(0, 1) - mouse), box31) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box31color, 1);
 
     if(inBox(frag, box41,.005))
         fragColor = vec4(0);
     if(inBox(frag, box41))
         fragColor = vec4(box41color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box41) && fragCoord.x < 10 && fragCoord.y < 10)
+    if(inBox(abs(vec2(0, 1) - mouse), box41) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box41color, 1);
 }
