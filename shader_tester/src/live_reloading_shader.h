@@ -27,6 +27,9 @@ public:
 
     void Tick();
 
+    bool gainedFocus = false;
+    void RequestFocus();
+
 private:
     const fs::path shaderPath;
     const std::unique_ptr<sf::RenderWindow> window;
@@ -43,6 +46,7 @@ private:
     const std::string textureHeaders;
 
     std::chrono::steady_clock::time_point lastT;
+    std::chrono::steady_clock::time_point lastGainedFocus = std::chrono::steady_clock::now();
 
 public:
     bool windowClosed;

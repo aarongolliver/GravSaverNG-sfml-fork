@@ -36,8 +36,17 @@ void _main(std::vector<std::string> args) {
     }
 
     SimpleFileWatcher fw(projectDirectory);
-
+    int i = 0;
+    const int t = 100;
+    using namespace std::chrono;
+    time_point<steady_clock> tSamplesAgo = steady_clock::now();
     while (1) {
+        if (++i % t == 0) {
+            i = 0;
+            auto now = steady_clock::now();
+            std::cout << 1. / ((now - tSamplesAgo).count() * (1. / steady_clock::period::den) / (1. * t)) << std::endl;
+            tSamplesAgo = now;
+        }
         for (const auto& shader : shaders) {
             shader.second->UpdatePreviousFrame();
         }
@@ -89,6 +98,19 @@ void _main(std::vector<std::string> args) {
             shader.second->Tick();
             if (shader.second->windowClosed)
                 return;
+        }
+
+        for (const auto& shader : shaders) {
+            if (shader.second->gainedFocus)
+            {
+                for (const auto& shader : shaders) {
+                    shader.second->RequestFocus();
+                }
+                for (const auto& shader : shaders) {
+                    shader.second->gainedFocus = false;
+                }
+                break;
+            }
         }
     }
 }
