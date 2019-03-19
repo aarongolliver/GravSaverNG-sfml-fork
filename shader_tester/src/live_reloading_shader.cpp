@@ -34,6 +34,7 @@ namespace {
 
 }
 
+static sf::ContextSettings cs;
 LiveReloadingShader::LiveReloadingShader(const fs::path& _shaderPath, std::vector<std::pair<fs::path, std::unique_ptr<LiveReloadingShader>>>& _shaders)
     : shaderPath(_shaderPath)
     , fw(_shaderPath.parent_path().generic_string())
@@ -45,10 +46,11 @@ LiveReloadingShader::LiveReloadingShader(const fs::path& _shaderPath, std::vecto
     , textureHeaders(GetTextureNames(shaders))
     , lastT(std::chrono::steady_clock::now())
 {
-    window->setVerticalSyncEnabled(true);
+    window->setVerticalSyncEnabled(false);
     window->setFramerateLimit(0);
-    previousFrame.create(window->getSize().x, window->getSize().y);
-    currentFrame.create(window->getSize().x, window->getSize().y);
+    cs.antialiasingLevel = sf::RenderTexture::getMaximumAntialiasingLevel();;
+    previousFrame.create(window->getSize().x, window->getSize().y, cs);
+    currentFrame.create(window->getSize().x, window->getSize().y, cs);
 }
 
 LiveReloadingShader::~LiveReloadingShader() {
@@ -76,6 +78,7 @@ void LiveReloadingShader::UpdateShader() {
     std::cout << "LOADED: " << shaderPath.stem().generic_string() << std::endl;
 }
 
+int i = 0;
 void LiveReloadingShader::Tick() {
     window->clear();
     currentFrame.clear();
@@ -115,8 +118,8 @@ void LiveReloadingShader::Tick() {
         }
         if (e.type == sf::Event::Resized) {
             window->setView({ {e.size.width / 2.f, e.size.height / 2.f}, {1.f*e.size.width, 1.f*e.size.height} });
-            currentFrame.create(e.size.width, e.size.height);
-            previousFrame.create(e.size.width, e.size.height);
+            currentFrame.create(e.size.width, e.size.height, cs);
+            previousFrame.create(e.size.width, e.size.height, cs);
         }
         if (e.type == sf::Event::MouseButtonPressed && e.mouseButton.button == sf::Mouse::Button::Left)
             mouseEnabled = true;
@@ -126,11 +129,22 @@ void LiveReloadingShader::Tick() {
             if (mouseEnabled)
                 mousePos = { e.mouseMove.x * 1.f / window->getSize().x, e.mouseMove.y *  1.f / window->getSize().y };
         }
+        if (e.type == sf::Event::GainedFocus) {
+            gainedFocus = true;
+        }
     }
 }
 
 const sf::Texture& LiveReloadingShader::GetPreviousFrameTexture() const {
     return previousFrame.getTexture();
+}
+
+void LiveReloadingShader::RequestFocus() {
+    if (lastGainedFocus < std::chrono::steady_clock::now() - 1s) {
+        window->requestFocus();
+        lastGainedFocus = std::chrono::steady_clock::now();
+    }
+    gainedFocus = false;
 }
 
 std::string LiveReloadingShader::GetTextureName() const {
