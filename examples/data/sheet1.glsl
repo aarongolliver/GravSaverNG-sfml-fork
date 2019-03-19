@@ -21,4 +21,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
             }
         }
     }
+
+    if(frag.x < .02)
+    fragColor = vec4(.5);
+    if(frag.x < .01)
+    fragColor = vec4(1);
 }
