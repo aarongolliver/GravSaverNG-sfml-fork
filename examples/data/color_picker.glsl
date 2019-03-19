@@ -9,17 +9,10 @@ vec3 box31color = vec3(156, 117, 95) / 225.;
 vec3 box40color = vec3(89, 161, 79) / 225.;
 vec3 box41color = vec3(186, 176, 172) / 225.;
 
-bool inBox(vec2 frag, vec2 start, float offset = 0) {
+bool inBox(vec2 frag, vec2 start, float offset) {
 	float size = .1;
 	frag -= start;
 	return frag.x > -offset && frag.y > -offset && frag.x < size+offset && frag.y < size+offset;
-}
-
-vec3 borderColor(vec2 frag, vec2 start) {
-	if(inBox(frag, start))
-	    return vec3(0);
-	else
-	    return vec3(1);
 }
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
@@ -54,73 +47,73 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
     if(inBox(frag, box00,.005))
         fragColor = vec4(0);
-    if(inBox(frag, box00))
+    if(inBox(frag, box00, 0))
         fragColor = vec4(box00color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box00) && fragCoord.x < 1 && fragCoord.y < 1)
+    if(inBox(abs(vec2(0, 1) - mouse), box00, 0) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box00color, 1);
 
     if(inBox(frag, box10,.005))
         fragColor = vec4(0);
-    if(inBox(frag, box10))
+    if(inBox(frag, box10, 0))
         fragColor = vec4(box10color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box10) && fragCoord.x < 1 && fragCoord.y < 1)
+    if(inBox(abs(vec2(0, 1) - mouse), box10, 0) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box10color, 1);
 
 
     if(inBox(frag, box20,.005))
         fragColor = vec4(0);
-    if(inBox(frag, box20))
+    if(inBox(frag, box20,0))
         fragColor = vec4(box20color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box20) && fragCoord.x < 1 && fragCoord.y < 1)
+    if(inBox(abs(vec2(0, 1) - mouse), box20,0) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box20color, 1);
 
     if(inBox(frag, box30,.005))
         fragColor = vec4(0);
-    if(inBox(frag, box30))
+    if(inBox(frag, box30,0))
         fragColor = vec4(box30color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box30) && fragCoord.x < 1 && fragCoord.y < 1)
+    if(inBox(abs(vec2(0, 1) - mouse), box30,0) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box30color, 1);
 
     if(inBox(frag, box40,.005))
         fragColor = vec4(0);
-    if(inBox(frag, box40))
+    if(inBox(frag, box40,0))
         fragColor = vec4(box40color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box40) && fragCoord.x < 1 && fragCoord.y < 1)
+    if(inBox(abs(vec2(0, 1) - mouse), box40,0) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box40color, 1);
 
     if(inBox(frag, box01,.005))
         fragColor = vec4(0);
-    if(inBox(frag, box01))
+    if(inBox(frag, box01,0))
         fragColor = vec4(box01color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box01) && fragCoord.x < 1 && fragCoord.y < 1)
+    if(inBox(abs(vec2(0, 1) - mouse), box01,0) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box01color, 1);
 
     if(inBox(frag, box11,.005))
         fragColor = vec4(0);
-    if(inBox(frag, box11))
+    if(inBox(frag, box11,0))
         fragColor = vec4(box11color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box11) && fragCoord.x < 1 && fragCoord.y < 1)
+    if(inBox(abs(vec2(0, 1) - mouse), box11,0) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box11color, 1);
 
 
     if(inBox(frag, box21,.005))
         fragColor = vec4(0);
-    if(inBox(frag, box21))
+    if(inBox(frag, box21,0))
         fragColor = vec4(box21color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box21) && fragCoord.x < 1 && fragCoord.y < 1)
+    if(inBox(abs(vec2(0, 1) - mouse), box21,0) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box21color, 1);
 
     if(inBox(frag, box31,.005))
         fragColor = vec4(0);
-    if(inBox(frag, box31))
+    if(inBox(frag, box31,0))
         fragColor = vec4(box31color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box31) && fragCoord.x < 1 && fragCoord.y < 1)
+    if(inBox(abs(vec2(0, 1) - mouse), box31,0) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box31color, 1);
 
     if(inBox(frag, box41,.005))
         fragColor = vec4(0);
-    if(inBox(frag, box41))
+    if(inBox(frag, box41,0))
         fragColor = vec4(box41color, 1);
-    if(inBox(abs(vec2(0, 1) - mouse), box41) && fragCoord.x < 1 && fragCoord.y < 1)
+    if(inBox(abs(vec2(0, 1) - mouse), box41,0) && fragCoord.x < 1 && fragCoord.y < 1)
         fragColor = vec4(box41color, 1);
 }
