@@ -84,6 +84,7 @@ void LiveReloadingShader::UpdatePreviousFrame() {
 void LiveReloadingShader::UpdateShader() {
     bool success = false;
     do {
+        textureHeaders = GetTextureNames(shaders);
         success = shader.loadFromMemory(shaderHeader + textureHeaders + headerEnd + LoadFile(shaderPath.generic_string()), sf::Shader::Type::Fragment);
         if (!success) {
             std::cerr << "FAILED TO LOAD SHADER: " << shaderPath.stem().generic_string() << std::endl;
