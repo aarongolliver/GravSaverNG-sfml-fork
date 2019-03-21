@@ -20,7 +20,10 @@ namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 
 void _main(std::vector<std::string> args) {
-    const auto& projectDirectory = args[1];
+    auto path = fs::path{ args[1] };
+    if (path.has_extension())
+        path.remove_filename();
+    const auto& projectDirectory = path.generic_string();
 
     std::vector<std::pair<fs::path, std::unique_ptr<LiveReloadingShader>>> shaders;
     for (const auto & shaderFile : fs::directory_iterator(projectDirectory)) {
@@ -47,6 +50,11 @@ void _main(std::vector<std::string> args) {
             std::cout << 1. / ((now - tSamplesAgo).count() * (1. / steady_clock::period::den) / (1. * t)) << std::endl;
             tSamplesAgo = now;
         }
+
+        if (shaders.empty()) {
+            std::this_thread::sleep_for(100ms);
+        }
+
         for (const auto& shader : shaders) {
             shader.second->UpdatePreviousFrame();
         }
@@ -55,7 +63,12 @@ void _main(std::vector<std::string> args) {
             {
                 std::vector<fs::path> currentFileset;
                 for (const auto & shaderFile : fs::directory_iterator(projectDirectory)) {
-                    currentFileset.emplace_back(shaderFile.path());
+                    if(shaderFile.path().has_extension() && shaderFile.path().extension() == ".glsl")
+                        currentFileset.emplace_back(shaderFile.path());
+                }
+
+                if (currentFileset.size() != shaders.size()) {
+                    std::cout << "added or removed shaders, new size: " << currentFileset.size() << " old size: shaders.size()" << std::endl;
                 }
 
                 // see if any of the currently loaded shaders are no longer in the folder

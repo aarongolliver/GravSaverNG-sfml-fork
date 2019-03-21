@@ -39,11 +39,12 @@ private:
     sf::RenderTexture currentFrame;
     sf::RenderTexture previousFrame;
     sf::Vector2f mousePos;
+    sf::Vector2f size;
 
     bool mouseEnabled;
 
     std::vector<std::pair<fs::path, std::unique_ptr<LiveReloadingShader>>>& shaders;
-    const std::string textureHeaders;
+    std::string textureHeaders;
 
     std::chrono::steady_clock::time_point lastT;
     std::chrono::steady_clock::time_point lastGainedFocus = std::chrono::steady_clock::now();

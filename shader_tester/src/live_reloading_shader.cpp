@@ -17,7 +17,7 @@ namespace {
     std::string SanatizeTextureName(const std::string& stem) {
         std::string ret;
         for (const auto& c : stem) {
-            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_')) {
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_') || (c >= '0' && c <= '9')) {
                 ret += c;
             }
         }
@@ -34,23 +34,39 @@ namespace {
 
 }
 
-static sf::ContextSettings cs;
+static sf::ContextSettings s_CS;
+
 LiveReloadingShader::LiveReloadingShader(const fs::path& _shaderPath, std::vector<std::pair<fs::path, std::unique_ptr<LiveReloadingShader>>>& _shaders)
     : shaderPath(_shaderPath)
     , fw(_shaderPath.parent_path().generic_string())
-    , window(std::make_unique<sf::RenderWindow>(sf::VideoMode{ 512, 512 }, _shaderPath.stem().generic_string(), sf::Style::Resize))
+    , window(std::make_unique<sf::RenderWindow>(sf::VideoMode{ 512, 512 }, _shaderPath.stem().generic_string(), sf::Style::Resize | sf::Style::Titlebar | sf::Style::Close))
     , mousePos(.5, .5)
     , mouseEnabled(false)
     , windowClosed(false)
     , shaders(_shaders)
     , textureHeaders(GetTextureNames(shaders))
     , lastT(std::chrono::steady_clock::now())
+    , size{ 512,512 }
 {
+    static int posX = 0, posY = 0;
+
     window->setVerticalSyncEnabled(false);
     window->setFramerateLimit(0);
-    cs.antialiasingLevel = sf::RenderTexture::getMaximumAntialiasingLevel();;
-    previousFrame.create(window->getSize().x, window->getSize().y, cs);
-    currentFrame.create(window->getSize().x, window->getSize().y, cs);
+    s_CS.antialiasingLevel = sf::RenderTexture::getMaximumAntialiasingLevel();
+    previousFrame.create(window->getSize().x, window->getSize().y, s_CS);
+    currentFrame.create(window->getSize().x, window->getSize().y, s_CS);
+
+    window->setPosition({ posX, posY });
+    if (posX > 1024) {
+        posX = 0;
+        posY += 512;
+    }
+    else {
+        posX += 512;
+    }
+    if (posY > 1024) {
+        posY = 0;
+    }
 }
 
 LiveReloadingShader::~LiveReloadingShader() {
@@ -69,12 +85,16 @@ void LiveReloadingShader::UpdatePreviousFrame() {
 void LiveReloadingShader::UpdateShader() {
     bool success = false;
     do {
+        textureHeaders = GetTextureNames(shaders);
         success = shader.loadFromMemory(shaderHeader + textureHeaders + headerEnd + LoadFile(shaderPath.generic_string()), sf::Shader::Type::Fragment);
         if (!success) {
             std::cerr << "FAILED TO LOAD SHADER: " << shaderPath.stem().generic_string() << std::endl;
-            std::this_thread::sleep_for(100ms);
+            std::this_thread::sleep_for(1000ms);
+            ClearCmd();
         }
     } while (!success);
+    shader.setUniform("iResolution", sf::Glsl::Vec2(size));
+    shader.setUniform("iMouse", sf::Glsl::Vec2(mousePos.x * size.x, mousePos.y * size.y));
     std::cout << "LOADED: " << shaderPath.stem().generic_string() << std::endl;
 }
 
@@ -82,14 +102,11 @@ int i = 0;
 void LiveReloadingShader::Tick() {
     window->clear();
     currentFrame.clear();
-    const auto& size = window->getSize();
     auto now = std::chrono::steady_clock::now();
     shader.setUniform("iTime", (now - startT).count() * 1.f / std::chrono::steady_clock::period::den);
     float timeDelta = (now - lastT).count() * 1.f / std::chrono::steady_clock::period::den;
     shader.setUniform("iTimeDelta", timeDelta);
     lastT = now;
-    shader.setUniform("iResolution", sf::Glsl::Vec2(size));
-    shader.setUniform("iMouse", sf::Glsl::Vec2(mousePos.x * size.x, mousePos.y * size.y));
 
     for (const auto& otherShader : shaders) {
         const auto& name = otherShader.second->GetTextureName();
@@ -118,16 +135,24 @@ void LiveReloadingShader::Tick() {
         }
         if (e.type == sf::Event::Resized) {
             window->setView({ {e.size.width / 2.f, e.size.height / 2.f}, {1.f*e.size.width, 1.f*e.size.height} });
-            currentFrame.create(e.size.width, e.size.height, cs);
-            previousFrame.create(e.size.width, e.size.height, cs);
+            currentFrame.create(e.size.width, e.size.height, s_CS);
+            previousFrame.create(e.size.width, e.size.height, s_CS);
+            size = { 1.f*e.size.width, 1.f*e.size.height };
+            shader.setUniform("iResolution", sf::Glsl::Vec2(size));
         }
         if (e.type == sf::Event::MouseButtonPressed && e.mouseButton.button == sf::Mouse::Button::Left)
             mouseEnabled = true;
         if (e.type == sf::Event::MouseButtonReleased && e.mouseButton.button == sf::Mouse::Button::Left)
             mouseEnabled = false;
         if (e.type == sf::Event::MouseMoved) {
-            if (mouseEnabled)
+            if (mouseEnabled) {
                 mousePos = { e.mouseMove.x * 1.f / window->getSize().x, e.mouseMove.y *  1.f / window->getSize().y };
+                auto size = window->getSize();
+                shader.setUniform("iMouse", sf::Glsl::Vec2(mousePos.x * size.x, mousePos.y * size.y));
+            }
+        }
+        if (e.type == sf::Event::GainedFocus) {
+            gainedFocus = true;
         }
         if (e.type == sf::Event::GainedFocus) {
             gainedFocus = true;

@@ -850,7 +850,8 @@ static void printCompileErrorLog(std::string type, std::string log, std::string 
         std::regex_search(line, m, e);
         if (m.size() > 2) {
             auto linePos = atoi(m[0].str().c_str());
-            err() << sourceLines[linePos - 1] << std::endl;
+            if(linePos != 0)
+                err() << sourceLines[linePos - 1] << std::endl;
             err() << std::endl;
         }
     }
